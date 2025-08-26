@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "typecheck",
+      "type": "npm",
+      "script": "typecheck",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "lint",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "format",
+      "type": "npm",
+      "script": "format"
+    },
+    {
+      "label": "D1: open console",
+      "type": "shell",
+      "command": "npx wrangler d1 execute $DB_NAME --local --command '.tables'",
+      "problemMatcher": []
+    },
+    {
+      "label": "D1: apply migrations",
+      "type": "shell",
+      "command": "npx wrangler d1 migrations apply $DB_NAME --local",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Next",
+      "type": "npm",
+      "script": "dev"
+    },
+    {
+      "label": "Dev: Wrangler",
+      "type": "shell",
+      "command": "npx wrangler dev"
+    },
+    {
+      "label": "Dev: Full stack",
+      "dependsOn": ["Dev: Next", "Dev: Wrangler"],
+      "dependsOrder": "parallel"
+    }
+  ]
+}

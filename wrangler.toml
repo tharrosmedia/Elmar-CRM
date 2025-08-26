@@ -1,0 +1,17 @@
+name = "elmar_crm"
+main = "src/index.ts"
+compatibility_date = "2025-08-26"
+compatibility_flags = [ "nodejs_compat" ]  # Fix: Enables Node built-ins polyfills
+
+[[d1_databases]]
+binding = "ADMIN_DB"
+database_name = "admin_db"
+database_id = "f376f385-737f-4589-87db-53e16cd3ddaa"
+
+[[kv_namespaces]]
+binding = "TENANT_CONFIGS"
+id = "fa1a750bbefb4247b289a33fe4774b02"
+
+[vars]
+ACCOUNT_ID = "e389917ff47be3b722b6c3541b732926"
+WEBHOOK_SECRET = "Unoit2012!"

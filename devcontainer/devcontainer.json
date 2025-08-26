@@ -1,0 +1,28 @@
+{
+  "name": "Elmar CRM",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "corepack enable && corepack prepare pnpm@latest --activate || true && npm i -g wrangler && pnpm i || npm i",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "cloudflare.cloudflare-vscode",
+        "qwtel.sqlite-viewer"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "remoteEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.wrangler,destination=/root/.wrangler,type=bind"
+  ]
+}

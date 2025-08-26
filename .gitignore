@@ -1,0 +1,44 @@
+# System/OS Files
+.DS_Store
+**/.DS_Store
+*.tmp
+*.bak
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Next.js (Front-end with App Router + Tailwind)
+.next/
+next-env.d.ts
+out/
+.next/cache/
+
+# Cloudflare Workers (Wrangler/Miniflare for D1)
+.wrangler/
+workerd
+
+# Wrangler/Miniflare
+.wrangler/
+**/.wrangler/
+
+# Production Builds
+dist/
+build/
+
+# IDE/Dev Tools (optional; remove if sharing workspace configs)
+.vscode/*.code-workspace

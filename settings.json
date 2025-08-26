@@ -1,0 +1,52 @@
+{
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.organizeImports": "always"
+  },
+
+  // TypeScript / JS
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+
+  // ESLint + Prettier
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+  "prettier.useEditorConfig": true,
+
+  // Tailwind IntelliSense
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.experimental.classRegex": [
+    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^'\"`]*)(?:'|\"|`)"],
+    ["cva\\(([^)]*)\\)", "(['\"`])([^'\"`]*)\\1"]
+  ],
+
+  // Next.js / App Router
+  "files.associations": {
+    "*.cts": "typescript",
+    "*.mts": "typescript"
+  },
+
+  // Spellchecker project vocab
+  "cSpell.words": [
+    "Argon2id",
+    "Cloudflare",
+    "Dialpad",
+    "Elmar",
+    "Housecall",
+    "Nextjs",
+    "prefetch",
+    "shadcn",
+    "tailwindcss",
+    "wrangler",
+    "Zod"
+  ],
+
+  // Testing (if/when you add Playwright or Vitest)
+  "testing.automaticallyOpenPeekView": "never"
+}

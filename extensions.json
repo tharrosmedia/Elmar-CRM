@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-close-tag",
+    "usernamehw.errorlens",
+    "ms-azuretools.vscode-docker",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    "naumovs.color-highlight",
+    "Gruntfuggly.todo-tree",
+    "mhutchie.git-graph",
+    "mechatroner.rainbow-csv",
+    "qwtel.sqlite-viewer",
+    "cloudflare.cloudflare-vscode",          // Workers, KV, D1 helpers
+    "ms-vscode.vscode-js-profile-flame"      // Perf profiling when needed
+  ]
+}
