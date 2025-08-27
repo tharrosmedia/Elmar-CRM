@@ -5,33 +5,41 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
-    "source.organizeImports": "always"
+    "source.organizeImports": "always",
+    "source.addMissingImports": "always" // Auto-import missing dependencies
   },
-
   // TypeScript / JS
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-
+  "typescript.updateImportsOnFileMove.enabled": "always", // Auto-update imports on file rename
   // ESLint + Prettier
   "eslint.experimental.useFlatConfig": true,
   "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+  "eslint.options": {
+    "reportUnusedDisableDirectives": true // Catch unused ESLint disables
+  },
   "prettier.useEditorConfig": true,
-
   // Tailwind IntelliSense
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.experimental.classRegex": [
     ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^'\"`]*)(?:'|\"|`)"],
     ["cva\\(([^)]*)\\)", "(['\"`])([^'\"`]*)\\1"]
   ],
-
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript", // Better Tailwind support in TS files
+    "typescriptreact": "javascript"
+  },
   // Next.js / App Router
   "files.associations": {
     "*.cts": "typescript",
-    "*.mts": "typescript"
+    "*.mts": "typescript",
+    "*.tsx": "typescriptreact",
+    "*.jsx": "javascriptreact"
   },
-
+  // Accessibility
+  "accessibility.accessibilitySignals.formControlMissingLabel": "warning", // Enforce WCAG 2.1 AA form labels
   // Spellchecker project vocab
   "cSpell.words": [
     "Argon2id",
@@ -39,14 +47,24 @@
     "Dialpad",
     "Elmar",
     "Housecall",
+    "Hyperdrive",
     "Nextjs",
     "prefetch",
+    "R2",
     "shadcn",
     "tailwindcss",
+    "Turnstile",
     "wrangler",
     "Zod"
   ],
-
-  // Testing (if/when you add Playwright or Vitest)
-  "testing.automaticallyOpenPeekView": "never"
+  // Testing (Playwright/Vitest)
+  "testing.automaticallyOpenPeekView": "never",
+  "playwright.reuseBrowser": true, // Optimize Playwright for CI
+  // Performance and Edge Runtime
+  "editor.quickSuggestions": {
+    "strings": true // Faster string completions for Edge runtime
+  },
+  // i18n Support
+  "i18n-ally.localesPaths": ["app/locales"], // For next-intl translations
+  "i18n-ally.keystyle": "nested" // Nested JSON for translations
 }

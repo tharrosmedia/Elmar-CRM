@@ -1,12 +1,27 @@
+# wrangler.toml
 name = "elmar_crm"
 main = "src/index.ts"
 compatibility_date = "2025-08-26"
-compatibility_flags = [ "nodejs_compat" ]  # Fix: Enables Node built-ins polyfills
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "RATE_LIMIT"
+class_name = "RateLimiter"
+
+[durable_objects]
+[[durable_objects.migrations]]
+tag = "v1"
+new_classes = ["RateLimiter"]
 
 [[d1_databases]]
 binding = "ADMIN_DB"
 database_name = "admin_db"
 database_id = "f376f385-737f-4589-87db-53e16cd3ddaa"
+
+[[d1_databases]]
+binding = "TENANT_DB_elmar"
+database_name = "elmar_crm"
+database_id = "1b3f5d39-a2d7-4467-bab8-db02bd8fc910"
 
 [[kv_namespaces]]
 binding = "TENANT_CONFIGS"
@@ -15,3 +30,13 @@ id = "fa1a750bbefb4247b289a33fe4774b02"
 [vars]
 ACCOUNT_ID = "e389917ff47be3b722b6c3541b732926"
 WEBHOOK_SECRET = "Unoit2012!"
+HCP_WEBHOOK_SECRET = "72ce9c746a994983a6291ba934295247"
+DIALPAD_WEBHOOK_SECRET = "wKyXQqXJuHKJtvpQHR56xV86FXXbkrjpMRAFuAchvWYsRurYVbY37yRSSp4wcN4Sbx47jYx5UXPSDzhrMYw8jdfadjdnYmwxPZNY"
+DIALPAD_SECRET_PROP = "G9vHh2kW4z!"
+
+[[services]]
+binding = "SENDGRID"
+service = "sendgrid-worker"
+
+[triggers]
+crons = ["*/5 * * * *"]

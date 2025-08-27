@@ -1,20 +1,26 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "bradlc.vscode-tailwindcss",
-    "ms-vscode.vscode-typescript-next",
-    "formulahendry.auto-close-tag",
-    "usernamehw.errorlens",
-    "ms-azuretools.vscode-docker",
-    "christian-kohler.path-intellisense",
-    "streetsidesoftware.code-spell-checker",
-    "naumovs.color-highlight",
-    "Gruntfuggly.todo-tree",
-    "mhutchie.git-graph",
-    "mechatroner.rainbow-csv",
-    "qwtel.sqlite-viewer",
-    "cloudflare.cloudflare-vscode",          // Workers, KV, D1 helpers
-    "ms-vscode.vscode-js-profile-flame"      // Perf profiling when needed
+    "dbaeumer.vscode-eslint", // ESLint for linting (TypeScript, Next.js, accessibility)
+    "esbenp.prettier-vscode", // Prettier for formatting
+    "bradlc.vscode-tailwindcss", // Tailwind CSS IntelliSense
+    "ms-vscode.vscode-typescript-next", // TypeScript support
+    "formulahendry.auto-close-tag", // Auto-close HTML/JSX tags
+    "usernamehw.errorlens", // Inline error diagnostics
+    "ms-azuretools.vscode-docker", // Docker for local testing
+    "christian-kohler.path-intellisense", // Path autocompletion
+    "streetsidesoftware.code-spell-checker", // Spellchecking with custom words
+    "naumovs.color-highlight", // Highlight Tailwind color values
+    "Gruntfuggly.todo-tree", // Visualize TODOs
+    "mhutchie.git-graph", // Git history visualization
+    "mechatroner.rainbow-csv", // CSV import/export debugging
+    "qwtel.sqlite-viewer", // D1 database viewer
+    "cloudflare.cloudflare-vscode", // Cloudflare Workers, KV, D1
+    "ms-vscode.vscode-js-profile-flame", // Performance profiling
+    "aaron-bond.better-comments", // Enhanced comment annotations
+    "wix.vscode-import-cost", // Monitor import sizes for Edge runtime
+    "deque-systems.vscode-axe-linter", // Accessibility auditing (WCAG 2.1 AA)
+    "i18n-ally.i18n-ally", // i18n support for next-intl
+    "ms-playwright.playwright", // Playwright for e2e testing
+    "vitest.explorer" // Vitest for unit/integration testing
   ]
 }

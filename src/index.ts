@@ -1,53 +1,141 @@
 /// <reference path="../worker-configuration.d.ts" />
 import { Hono } from 'hono';
-import { authRouter } from './routes/auth'; // No extension (bundler resolution)
+import { cors } from 'hono/cors';
+import { secureHeaders } from 'hono/secure-headers';
+import { authRouter } from './routes/auth';
 import { adminRouter } from './routes/admin';
 import { webhooksRouter } from './routes/webhooks';
 import { jobsRouter } from './routes/jobs';
 import { authMiddleware } from './utils/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { verifyWebhookSignature } from './utils/webhook';
+import { RateLimiter } from './rate-limiter';
 
-const app = new Hono<{ Bindings: Env; Variables: { user: { id: string; tenantSlug: string | null; role: string } } }>(); // Define Variables for user (fixes c.get overload/unknown)
+const app = new Hono<{
+  Bindings: Env;
+  Variables: { user: { id: string; tenantSlug: string | null; role: string } };
+}>();
 
-// Mount routes with prefixes
-app.route('/api/auth', authRouter); // e.g., /api/auth/login
-app.use('/api/admin/*', authMiddleware);
-app.route('/api/admin', adminRouter); // e.g., /api/admin/onboard-tenant
-app.route('/api/webhooks', webhooksRouter); // e.g., /api/webhooks/hcp
-app.use('/api/jobs/*', authMiddleware);
-app.route('/api/jobs', jobsRouter); // e.g., /api/jobs
-
-// Global error handling (logs with IDs; integrate Sentry)
-app.onError((err, c) => {
-  const errorId = uuidv4(); // For correlation
-  console.error(`Error ID: ${errorId}`, err);
-  // Audit log error if user context
-  if (c.get('user')?.id) { // Optional chaining (fixes "Property 'id' does not exist")
-    c.env.ADMIN_DB.prepare('INSERT INTO audit_logs (user_id, action, details) VALUES (?, ?, ?)').bind(c.get('user').id, 'error', JSON.stringify({ path: c.req.path, message: err.message })).run();
+// Global middleware
+app.use(
+  '/api/*',
+  cors({
+    origin: ['https://crm.elmarhvac.com', 'http://localhost:3000'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Webhook-Signature'],
+    credentials: true,
+  })
+);
+app.use('/api/*', secureHeaders());
+app.use('/api/*', async (c, next) => {
+  const tenantSlug = c.get('user')?.tenantSlug || 'unknown';
+  const rateLimitKey = `rate:${tenantSlug}:${c.req.path}`;
+  const { success } = await c.env.RATE_LIMIT.limit({ key: rateLimitKey, window: 60, max: 100 });
+  if (!success) {
+    return c.json({ error: 'Rate limit exceeded' }, 429);
   }
-  return c.json({ error: err.message, errorId }, 500);
+  await next();
+});
+
+// Mount routes
+app.route('/api/auth', authRouter);
+app.use('/api/admin/*', authMiddleware);
+app.route('/api/admin', adminRouter);
+app.use('/api/webhooks/*', async (c, next) => {
+  const signature = c.req.header('X-Webhook-Signature') || '';
+  const timestamp = c.req.header('X-Webhook-Timestamp') || '';
+  const payload = await c.req.text();
+  const secret = c.req.path.includes('/hcp') ? c.env.HCP_WEBHOOK_SECRET : c.env.DIALPAD_WEBHOOK_SECRET;
+  const isValid = await verifyWebhookSignature(payload, signature, timestamp, secret);
+  if (!isValid) {
+    return c.json({ error: 'Invalid webhook signature' }, 401);
+  }
+  await next();
+});
+app.route('/api/webhooks', webhooksRouter);
+app.use('/api/jobs/*', authMiddleware);
+app.route('/api/jobs', jobsRouter);
+
+// Global error handling
+app.onError(async (err, c) => {
+  const errorId = uuidv4();
+  console.error(`Error ID: ${errorId}`, err);
+  const user = c.get('user');
+  if (user?.id) {
+    const details = JSON.stringify({ path: c.req.path, message: err.message });
+    const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encryptedDetails = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      new TextEncoder().encode(details)
+    );
+    await c.env.ADMIN_DB.prepare('INSERT INTO audit_logs (user_id, action, details, iv) VALUES (?, ?, ?, ?)')
+      .bind(user.id, 'error', Buffer.from(encryptedDetails).toString('base64'), Buffer.from(iv).toString('base64'))
+      .run();
+  }
+  return c.json({ error: 'Internal server error', errorId }, 500);
 });
 
 export default {
   fetch: app.fetch,
-  async scheduled(event: ScheduledEvent, env: Env) { // Fix: Use Env directly (bindings type)
-    // Cron: Process webhook queue (idempotent, retries with backoff)
+  async scheduled(event: ScheduledEvent, env: Env) {
     const { results } = await env.ADMIN_DB.prepare(`
       SELECT * FROM webhook_events WHERE status = 'pending' ORDER BY received_at ASC LIMIT 10
-    `).all<{ id: string; attempts?: number }>(); // Fix: Apply type to results, not array
+    `).all<{ id: string; tenantSlug: string; payload: string; attempts?: number; eventType: string }>();
     for (const evt of results || []) {
       try {
-        // TODO: Expand processing - get tenant DB/keys, parse payload, upsert idempotently (e.g., INSERT OR REPLACE INTO jobs)
-        // Use exponential backoff per-event (e.g., delay = 2 ** attempts * 1000ms + jitter)
-        await env.ADMIN_DB.prepare('UPDATE webhook_events SET status = ?, processed_at = CURRENT_TIMESTAMP WHERE id = ?')
-          .bind('success', evt.id).run();
+        const tenantConfig = await env.TENANT_CONFIGS.get(`tenant:${evt.tenantSlug}`, 'json');
+        if (!tenantConfig) throw new Error(`Tenant ${evt.tenantSlug} not found`);
+        const payload = JSON.parse(evt.payload);
+        const externalId = payload.externalId || evt.id;
+        const tenantDb = env[`TENANT_DB_${evt.tenantSlug}`] || env.DB; // Fallback to DB for existing tenant
+        if (!tenantDb) throw new Error(`No DB for tenant ${evt.tenantSlug}`);
+        if (evt.eventType.startsWith('job.')) {
+          await tenantDb
+            .prepare(
+              'INSERT OR REPLACE INTO jobs (external_id, tenant_slug, data, version) VALUES (?, ?, ?, ?)'
+            )
+            .bind(externalId, evt.tenantSlug, JSON.stringify(payload), 1)
+            .run();
+        }
+        await env.ADMIN_DB.prepare(
+          'UPDATE webhook_events SET status = ?, processed_at = CURRENT_TIMESTAMP WHERE id = ?'
+        )
+          .bind('success', evt.id)
+          .run();
       } catch (e) {
         const attempts = (Number(evt.attempts) || 0) + 1;
         const status = attempts >= 10 ? 'failed' : 'pending';
-        await env.ADMIN_DB.prepare('UPDATE webhook_events SET attempts = ?, status = ?, error = ? WHERE id = ?')
-          .bind(attempts, status, (e as Error).message, evt.id).run();
-        // Alert on failed (e.g., email via SendGrid if attempts >5)
+        const errorMessage = (e as Error).message;
+        if (status === 'failed') {
+          await env.ADMIN_DB.prepare(
+            'INSERT INTO dead_letter_queue (event_id, tenant_slug, payload, error) VALUES (?, ?, ?, ?)'
+          )
+            .bind(evt.id, evt.tenantSlug, evt.payload, errorMessage)
+            .run();
+        }
+        await env.ADMIN_DB.prepare(
+          'UPDATE webhook_events SET attempts = ?, status = ?, error = ? WHERE id = ?'
+        )
+          .bind(attempts, status, errorMessage, evt.id)
+          .run();
+        if (attempts > 5) {
+          await env.SENDGRID.fetch({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: 'admin@elmarhvac.com',
+              from: 'alerts@elmarhvac.com',
+              subject: `Webhook Failure: ${evt.id}`,
+              text: `Failed to process webhook ${evt.id} after ${attempts} attempts: ${errorMessage}`,
+            }),
+          });
+        }
       }
     }
   },
 };
+
+// Export Durable Objects
+export { RateLimiter };
