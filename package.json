@@ -10,8 +10,7 @@
     "typecheck": "tsc --noEmit",
     "wrangler:dev": "wrangler dev",
     "wrangler:deploy": "wrangler deploy",
-    "d1:migrate": "wrangler d1 migrations apply $DB_NAME",
-    "postinstall": "npx tailwindcss init -p"
+    "d1:migrate": "wrangler d1 migrations apply $DB_NAME"
   },
   "engines": {
     "node": ">=20"
@@ -37,6 +36,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250829.0",
     "@eslint/js": "latest",
+    "@tailwindcss/cli": "^4.1.12",
     "@types/node": "^24.3.0",
     "crypto-js": "^4.2.0",
     "eslint-config-next": "latest",

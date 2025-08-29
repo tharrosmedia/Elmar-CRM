@@ -2,26 +2,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone', // Standalone build for Cloudflare Pages/Workers
-  reactStrictMode: true, // Catch React issues in dev
-  outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM', // Project root for dependency tracing
+  reactStrictMode: true, // Catch React issues
+  outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM', // Project root
   experimental: {
-    reactCompiler: true, // Enable React Compiler for auto-memoization (Next.js 15)
-    turbopack: true, // Faster builds with Turbopack (Next.js 15)
-    optimizeServer: true, // Optimize server components for Edge
+    reactCompiler: true, // Auto-memoization for INP <50ms
+    turbopack: true, // Faster builds
+    optimizeServer: true, // Edge optimization
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.cloudflare.com', // For R2-hosted media (e.g., tenant logos, Dialpad media)
-      },
-      {
-        protocol: 'https',
-        hostname: '*.dialpad.com', // For Dialpad media URLs
-      },
+      { protocol: 'https', hostname: '*.cloudflare.com' }, // R2-hosted media (logos, Dialpad media)
+      { protocol: 'https', hostname: '*.dialpad.com' }, // Dialpad media
     ],
-    minimumCacheTTL: 60, // Cache images for 60s (aligns with API caching)
-    formats: ['image/avif', 'image/webp'], // Modern formats for performance
+    minimumCacheTTL: 60, // 60s cache (aligns with API caching TTL)
+    formats: ['image/avif', 'image/webp'], // Modern formats
   },
   async headers() {
     return [
@@ -45,21 +39,28 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://api.elmarhvac.com/:path*', // Proxy API requests to Workers
+        destination: 'https://api.elmarhvac.com/:path*', // Proxy to Workers
       },
     ];
   },
   i18n: {
-    locales: ['en', 'es', 'fr'], // Example locales for next-intl
+    locales: ['en', 'es', 'fr'], // Multi-language support
     defaultLocale: 'en',
-    localeDetection: true, // Auto-detect based on Accept-Language
+    localeDetection: true,
   },
   eslint: {
-    ignoreDuringBuilds: false, // Enforce ESLint in CI/CD
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: false, // Enforce type safety in CI/CD
+    ignoreBuildErrors: false,
+  },
+  // Add Tailwind v4 integration (optional for custom builds)
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.css$/,
+      use: ['@tailwindcss/vite'], // Use v4's Vite plugin for CSS processing
+    });
+    return config;
   },
 };
-
 module.exports = nextConfig;

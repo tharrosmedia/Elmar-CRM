@@ -1,7 +1,5 @@
 /* app/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -13,8 +11,9 @@
     --secondary-text: #6eacd8; /* Light blue for secondary text */
     --card-text: #ffffff; /* White for card text */
   }
-
   body {
-    @apply bg-background text-text font-sans;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; /* v4 system fonts */
   }
 }
