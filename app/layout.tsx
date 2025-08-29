@@ -1,5 +1,5 @@
 // app/layout.tsx
-import '../globals.css';
+import 'globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Elmar HVAC CRM' };
