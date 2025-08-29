@@ -6,7 +6,7 @@ const nextConfig = {
   outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM',
   experimental: {
     reactCompiler: true,
-    turbopack: { resolve: true }, // Explicitly enable to reduce warning
+    turbopack: { resolve: true },
   },
   images: {
     remotePatterns: [
@@ -47,13 +47,6 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: false,
-  },
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.css$/,
-      use: ['@tailwindcss/vite'],
-    });
-    return config;
   },
 };
 module.exports = nextConfig;
