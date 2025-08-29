@@ -41,6 +41,7 @@
     "@types/node": "^24.3.0",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "crypto-js": "^4.2.0",
+    "cssnano": "^7.1.1",
     "eslint-config-next": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-react-hooks": "latest",

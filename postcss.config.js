@@ -1,8 +1,8 @@
 // postcss.config.js
 module.exports = {
   plugins: {
-    tailwindcss: {}, // Corrected to tailwindcss (matches installed package)
+    tailwindcss: {},
     autoprefixer: {},
-    ...(process.env.NODE_ENV === 'production' ? { cssnano: { preset: 'default' } } : {}), // Optimized minification
+    ...(process.env.NODE_ENV === 'production' ? { cssnano: {} } : {}),
   },
 };
