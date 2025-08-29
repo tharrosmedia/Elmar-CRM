@@ -1,20 +1,19 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Standalone build for Cloudflare Pages/Workers
-  reactStrictMode: true, // Catch React issues
-  outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM', // Project root
+  output: 'standalone',
+  reactStrictMode: true,
+  outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM',
   experimental: {
-    reactCompiler: true, // Enable React Compiler (requires babel-plugin-react-compiler)
-    turbopack: true, // Enable Turbopack for faster builds
-    // Removed 'optimizeServer' as it's not a valid option in v15.5.2
+    reactCompiler: true,
+    turbopack: { resolve: true }, // Explicitly enable to reduce warning
   },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '*.cloudflare.com' }, // R2-hosted media
-      { protocol: 'https', hostname: '*.dialpad.com' }, // Dialpad media
+      { protocol: 'https', hostname: '*.cloudflare.com' },
+      { protocol: 'https', hostname: '*.dialpad.com' },
     ],
-    minimumCacheTTL: 60, // 60s cache
+    minimumCacheTTL: 60,
     formats: ['image/avif', 'image/webp'],
   },
   async headers() {
@@ -39,16 +38,10 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://api.elmarhvac.com/:path*', // Proxy to Workers
+        destination: 'https://api.elmarhvac.com/:path*',
       },
     ];
   },
-  // Remove i18n config; use next-intl or custom solution
-  // i18n: {
-  //   locales: ['en', 'es', 'fr'],
-  //   defaultLocale: 'en',
-  //   localeDetection: true,
-  // },
   eslint: {
     ignoreDuringBuilds: false,
   },
@@ -58,7 +51,7 @@ const nextConfig = {
   webpack(config) {
     config.module.rules.push({
       test: /\.css$/,
-      use: ['@tailwindcss/vite'], // v4 integration with Vite
+      use: ['@tailwindcss/vite'],
     });
     return config;
   },
