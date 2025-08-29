@@ -4,12 +4,10 @@
 export interface Env {
   [key: `TENANT_DB_${string}`]: D1Database; // Dynamic tenant-specific D1 databases
   ADMIN_DB: D1Database;
-  DB: D1Database;
   TENANT_CONFIGS: KVNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   SENDGRID: Fetcher;
-  ACCOUNT_ID: string;
-  WEBHOOK_SECRET: string;
+  ZAPIER_WEBHOOK_SECRET: string;
   HCP_WEBHOOK_SECRET: string;
   DIALPAD_WEBHOOK_SECRET: string;
   DIALPAD_SECRET_PROP: string;

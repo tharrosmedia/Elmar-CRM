@@ -1,4 +1,4 @@
-/// <reference path="../worker-configuration.d.ts" />
+/// <reference path="../worker-configuration.d.ts" /> // Verify this path points to worker-configuration.d.ts in the project root
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: ['https://crm.elmarhvac.com', 'http://localhost:3000'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowHeaders: ['Content-Type', 'Authorization', 'X-Webhook-Signature'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Webhook-Signature', 'X-CRM-Webhook-Token'],
     credentials: true,
   })
 );
@@ -36,12 +36,17 @@ app.use('/api/*', async (c, next) => {
   }
   await next();
 });
-
 // Mount routes
 app.route('/api/auth', authRouter);
 app.use('/api/admin/*', authMiddleware);
 app.route('/api/admin', adminRouter);
 app.use('/api/webhooks/*', async (c, next) => {
+  // Bypass signature verification for /leads (uses X-CRM-Webhook-Token)
+  if (c.req.path.endsWith('/leads')) {
+    await next();
+    return;
+  }
+  // Apply signature verification for HCP and Dialpad webhooks
   const signature = c.req.header('X-Webhook-Signature') || '';
   const timestamp = c.req.header('X-Webhook-Timestamp') || '';
   const payload = await c.req.text();
@@ -55,7 +60,6 @@ app.use('/api/webhooks/*', async (c, next) => {
 app.route('/api/webhooks', webhooksRouter);
 app.use('/api/jobs/*', authMiddleware);
 app.route('/api/jobs', jobsRouter);
-
 // Global error handling
 app.onError(async (err, c) => {
   const errorId = uuidv4();
@@ -76,7 +80,6 @@ app.onError(async (err, c) => {
   }
   return c.json({ error: 'Internal server error', errorId }, 500);
 });
-
 export default {
   fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: Env) {
@@ -89,7 +92,7 @@ export default {
         if (!tenantConfig) throw new Error(`Tenant ${evt.tenantSlug} not found`);
         const payload = JSON.parse(evt.payload);
         const externalId = payload.externalId || evt.id;
-        const tenantDb = env[`TENANT_DB_${evt.tenantSlug}`] || env.DB; // Fallback to DB for existing tenant
+        const tenantDb = env[`TENANT_DB_${evt.tenantSlug}`] || env.DB;
         if (!tenantDb) throw new Error(`No DB for tenant ${evt.tenantSlug}`);
         if (evt.eventType.startsWith('job.')) {
           await tenantDb
@@ -97,6 +100,30 @@ export default {
               'INSERT OR REPLACE INTO jobs (external_id, tenant_slug, data, version) VALUES (?, ?, ?, ?)'
             )
             .bind(externalId, evt.tenantSlug, JSON.stringify(payload), 1)
+            .run();
+        } else if (evt.eventType === 'zapier_lead_create') {
+          const { first_name, last_name, email, phone, address, url, utm_campaign, utm_source, utm_medium, utm_content } = payload;
+          await tenantDb
+            .prepare(
+              `INSERT OR IGNORE INTO leads (
+                external_id, tenant_slug, first_name, last_name, email, phone, address, url,
+                utm_campaign, utm_source, utm_medium, utm_content
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            )
+            .bind(
+              externalId,
+              evt.tenantSlug,
+              first_name,
+              last_name,
+              email || null,
+              phone || null,
+              address || null,
+              url || null,
+              utm_campaign || null,
+              utm_source || null,
+              utm_medium || null,
+              utm_content || null
+            )
             .run();
         }
         await env.ADMIN_DB.prepare(
@@ -125,8 +152,8 @@ export default {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              to: 'admin@elmarhvac.com',
-              from: 'alerts@elmarhvac.com',
+              to: 'info@elmarair.com',
+              from: 'info@elmarair.com',
               subject: `Webhook Failure: ${evt.id}`,
               text: `Failed to process webhook ${evt.id} after ${attempts} attempts: ${errorMessage}`,
             }),
@@ -136,6 +163,5 @@ export default {
     }
   },
 };
-
 // Export Durable Objects
 export { RateLimiter };

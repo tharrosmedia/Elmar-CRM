@@ -2,10 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "noEmit": true,
     "strict": true,
     "isolatedModules": true,
@@ -20,19 +17,13 @@
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "plugins": [{ "name": "next" }]
   },
   "include": [
-    "src/**/*/*.ts",
+    "src/**/*.ts", // Covers src/index.ts and src/routes/webhooks.ts
+    "src/index.ts", // Temporary addition
     "worker-configuration.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

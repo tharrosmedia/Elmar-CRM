@@ -1,4 +1,3 @@
-# wrangler.toml
 name = "elmar_crm"
 main = "src/index.ts"
 compatibility_date = "2025-08-26"
@@ -29,10 +28,6 @@ id = "fa1a750bbefb4247b289a33fe4774b02"
 
 [vars]
 ACCOUNT_ID = "e389917ff47be3b722b6c3541b732926"
-WEBHOOK_SECRET = "Unoit2012!"
-HCP_WEBHOOK_SECRET = "72ce9c746a994983a6291ba934295247"
-DIALPAD_WEBHOOK_SECRET = "wKyXQqXJuHKJtvpQHR56xV86FXXbkrjpMRAFuAchvWYsRurYVbY37yRSSp4wcN4Sbx47jYx5UXPSDzhrMYw8jdfadjdnYmwxPZNY"
-DIALPAD_SECRET_PROP = "G9vHh2kW4z!"
 
 [[services]]
 binding = "SENDGRID"
