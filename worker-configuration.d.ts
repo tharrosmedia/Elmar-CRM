@@ -11,4 +11,6 @@ export interface Env {
   HCP_WEBHOOK_SECRET: string;
   DIALPAD_WEBHOOK_SECRET: string;
   DIALPAD_SECRET_PROP: string;
+  ACCOUNT_ID?: string; // Optional for admin/jobs routes
+  CF_API_TOKEN?: string; // Optional for admin/jobs routes
 }

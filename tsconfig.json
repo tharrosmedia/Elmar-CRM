@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
-    "types": ["@cloudflare/workers-types", "node"],
+    "types": ["@cloudflare/workers-types", "node", "vitest/globals"], // Updated for Vitest globals
     "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "react",
@@ -20,8 +20,7 @@
     "plugins": [{ "name": "next" }]
   },
   "include": [
-    "src/**/*.ts", // Covers src/index.ts and src/routes/webhooks.ts
-    "src/index.ts", // Temporary addition
+    "src/**/*.ts",
     "worker-configuration.d.ts",
     ".next/types/**/*.ts"
   ],

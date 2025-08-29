@@ -36,8 +36,6 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250826.0",
-    "vitest": "^2.0.0",
-    "@types/vitest": "^2.0.0",
     "@eslint/js": "latest",
     "@types/node": "^24.3.0",
     "crypto-js": "^4.2.0",
@@ -49,6 +47,7 @@
     "itty-router": "^5.0.22",
     "prettier": "latest",
     "typescript-eslint": "latest",
+    "vitest": "^3.2.4",
     "wrangler": "latest",
     "zod": "^4.1.3"
   },

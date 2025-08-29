@@ -3,7 +3,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'node', // Use 'jsdom' if testing browser-like code
-    globals: true, // Allows using describe/it/expect without imports
+    environment: 'node',
+    // For Cloudflare Workers, consider 'edge' or a custom environment
+    globals: true,
   },
 });
