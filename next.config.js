@@ -5,17 +5,17 @@ const nextConfig = {
   reactStrictMode: true, // Catch React issues
   outputFileTracingRoot: '/Users/elmarcorphq/Documents/Coding Projects/Elmar CRM', // Project root
   experimental: {
-    reactCompiler: true, // Auto-memoization for INP <50ms
-    turbopack: true, // Faster builds
-    optimizeServer: true, // Edge optimization
+    reactCompiler: true, // Enable React Compiler (requires babel-plugin-react-compiler)
+    turbopack: true, // Enable Turbopack for faster builds
+    // Removed 'optimizeServer' as it's not a valid option in v15.5.2
   },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '*.cloudflare.com' }, // R2-hosted media (logos, Dialpad media)
+      { protocol: 'https', hostname: '*.cloudflare.com' }, // R2-hosted media
       { protocol: 'https', hostname: '*.dialpad.com' }, // Dialpad media
     ],
-    minimumCacheTTL: 60, // 60s cache (aligns with API caching TTL)
-    formats: ['image/avif', 'image/webp'], // Modern formats
+    minimumCacheTTL: 60, // 60s cache
+    formats: ['image/avif', 'image/webp'],
   },
   async headers() {
     return [
@@ -43,22 +43,22 @@ const nextConfig = {
       },
     ];
   },
-  i18n: {
-    locales: ['en', 'es', 'fr'], // Multi-language support
-    defaultLocale: 'en',
-    localeDetection: true,
-  },
+  // Remove i18n config; use next-intl or custom solution
+  // i18n: {
+  //   locales: ['en', 'es', 'fr'],
+  //   defaultLocale: 'en',
+  //   localeDetection: true,
+  // },
   eslint: {
     ignoreDuringBuilds: false,
   },
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Add Tailwind v4 integration (optional for custom builds)
   webpack(config) {
     config.module.rules.push({
       test: /\.css$/,
-      use: ['@tailwindcss/vite'], // Use v4's Vite plugin for CSS processing
+      use: ['@tailwindcss/vite'], // v4 integration with Vite
     });
     return config;
   },
