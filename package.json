@@ -38,6 +38,7 @@
     "@cloudflare/workers-types": "^4.20250829.0",
     "@eslint/js": "latest",
     "@tailwindcss/cli": "^4.1.12",
+    "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^24.3.0",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "crypto-js": "^4.2.0",

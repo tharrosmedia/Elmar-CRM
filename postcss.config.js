@@ -1,8 +1,8 @@
 // postcss.config.js
 module.exports = {
   plugins: {
-    tailwindcss: {},
+    '@tailwindcss/postcss': {}, // Updated to use the separate PostCSS plugin
     autoprefixer: {},
-    ...(process.env.NODE_ENV === 'production' ? { cssnano: {} } : {}),
+    ...(process.env.NODE_ENV === 'production' ? { cssnano: { preset: 'default' } } : {}),
   },
 };
