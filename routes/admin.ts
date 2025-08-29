@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator'; // If validator error, use zVa
 import { z } from 'zod';
 import { createD1Database, getTenantDB } from '../src/utils/db'; // Adjust if needed
 import { KV_EXPIRATION_DAYS } from '../src/config/index';
+import { Env } from '../worker-configuration';
 
 const adminRouter = new Hono<{ Bindings: Env & { ACCOUNT_ID: string; CF_API_TOKEN: string } }>();
 

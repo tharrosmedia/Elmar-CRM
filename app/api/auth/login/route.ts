@@ -1,18 +1,15 @@
 // app/api/auth/login/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod'; // Ensure zod is imported
 
-export async function POST(request: Request) {
-  const { username, password } = await request.json();
-  if (username && password) {
-    // Mock: Accept any non-empty credentials for internal testing
-    const response = NextResponse.json({ success: true });
-    response.cookies.set("session", "mock-token", {
-      httpOnly: true,
-      maxAge: 3600, // 1 hour
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
-    return response;
-  }
-  return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+const loginSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+});
+
+export async function POST(request: NextRequest) {
+  const data = loginSchema.parse(await request.json());
+  const { username, password } = data;
+  // Add authentication logic
+  return NextResponse.json({ message: 'Login attempted' });
 }

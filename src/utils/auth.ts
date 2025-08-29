@@ -1,4 +1,4 @@
-/// <reference path="../../worker-configuration.d.ts" />
+import { Env } from '../../worker-configuration';
 import { createMiddleware } from 'hono/factory';
 
 export const authMiddleware = createMiddleware<{ Bindings: Env; Variables: { user: { id: string; tenantSlug: string | null; role: string } } }>(async (c, next) => {

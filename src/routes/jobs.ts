@@ -1,6 +1,6 @@
-/// <reference path="../../worker-configuration.d.ts" />
 import { Hono } from 'hono';
 import { getTenant, getTenantDB } from '../utils/db';
+import { Env } from '../../worker-configuration';
 
 const jobsRouter = new Hono<{ Bindings: Env & { ACCOUNT_ID: string; CF_API_TOKEN: string } }>();
 

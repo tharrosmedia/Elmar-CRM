@@ -1,7 +1,7 @@
-/// <reference path="../../worker-configuration.d.ts" /> // Verify this path points to worker-configuration.d.ts in the project root
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { createHmac } from 'crypto';
+import { Env } from '../../worker-configuration';
 
 const webhooksRouter = new Hono<{ Bindings: Env }>();
 

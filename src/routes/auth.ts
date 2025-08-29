@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as webAuthn from '@simplewebauthn/server';
 import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import { RP_NAME, HASH_SALT_PREFIX, SESSION_TTL, CHALLENGE_TTL } from '../config';
+import { Env } from '../../worker-configuration';
 
 const authRouter = new Hono<{
   Bindings: Env;

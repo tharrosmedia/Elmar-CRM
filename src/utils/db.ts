@@ -1,4 +1,4 @@
-/// <reference path="../../worker-configuration.d.ts" />
+import { Env } from '../../worker-configuration';
 // Dynamic D1 client via API (for tenant DBs)
 export async function getTenantDB(env: Env & { ACCOUNT_ID: string; CF_API_TOKEN: string }, dbId: string) {
   const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/d1/database/${dbId}`;

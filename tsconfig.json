@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
-    "types": ["@cloudflare/workers-types", "node", "vitest/globals"], // Updated for Vitest globals
+    "types": ["@cloudflare/workers-types", "node", "vitest/globals"],
     "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "react",
@@ -21,7 +21,9 @@
   },
   "include": [
     "src/**/*.ts",
+    "app/**/*.ts",
     "worker-configuration.d.ts",
+    "durable-object-augmentation.d.ts", // Added
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]

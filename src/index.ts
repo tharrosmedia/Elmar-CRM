@@ -1,4 +1,3 @@
-/// <reference path="../worker-configuration.d.ts" /> // Verify this path points to worker-configuration.d.ts in the project root
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
@@ -10,6 +9,7 @@ import { authMiddleware } from './utils/auth';
 import { v4 as uuidv4 } from 'uuid';
 import { verifyWebhookSignature } from './utils/webhook';
 import { RateLimiter } from './rate-limiter';
+import { Env } from '../worker-configuration';
 
 const app = new Hono<{
   Bindings: Env;
@@ -30,7 +30,8 @@ app.use('/api/*', secureHeaders());
 app.use('/api/*', async (c, next) => {
   const tenantSlug = c.get('user')?.tenantSlug || 'unknown';
   const rateLimitKey = `rate:${tenantSlug}:${c.req.path}`;
-  const { success } = await c.env.RATE_LIMIT.limit({ key: rateLimitKey, window: 60, max: 100 });
+  const rateLimiter = c.env.RATE_LIMIT.get(c.env.RATE_LIMIT.idFromName(rateLimitKey));
+  const { success } = await (rateLimiter as any).limit({ key: rateLimitKey, window: 60, max: 100 }); // Cast to any or define interface
   if (!success) {
     return c.json({ error: 'Rate limit exceeded' }, 429);
   }
@@ -148,16 +149,16 @@ export default {
           .bind(attempts, status, errorMessage, evt.id)
           .run();
         if (attempts > 5) {
-          await env.SENDGRID.fetch({
+          await env.SENDGRID.fetch(new Request('https://api.sendgrid.com/v3/mail/send',{
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: new Headers({ 'Content-Type': 'application/json'}), // Use Headers constructor
             body: JSON.stringify({
               to: 'info@elmarair.com',
               from: 'info@elmarair.com',
               subject: `Webhook Failure: ${evt.id}`,
               text: `Failed to process webhook ${evt.id} after ${attempts} attempts: ${errorMessage}`,
-            }),
-          });
+            }) as BodyInit, // Cast string as BodyInit
+          }));
         }
       }
     }
