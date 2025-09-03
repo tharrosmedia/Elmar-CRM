@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { verifyWebhookSignature } from './utils/webhook';
 import { RateLimiter } from './rate-limiter';
 import { Env } from '../worker-configuration';
+import { handleSendgrid } from './sendgrid'; // Import the updated handler
 
 const app = new Hono<{
   Bindings: Env;
@@ -31,7 +32,7 @@ app.use('/api/*', async (c, next) => {
   const tenantSlug = c.get('user')?.tenantSlug || 'unknown';
   const rateLimitKey = `rate:${tenantSlug}:${c.req.path}`;
   const rateLimiter = c.env.RATE_LIMIT.get(c.env.RATE_LIMIT.idFromName(rateLimitKey));
-  const { success } = await (rateLimiter as any).limit({ key: rateLimitKey, window: 60, max: 100 }); // Cast to any or define interface
+  const { success } = await (rateLimiter as any).limit({ key: rateLimitKey, window: 60, max: 100 });
   if (!success) {
     return c.json({ error: 'Rate limit exceeded' }, 429);
   }
@@ -42,12 +43,10 @@ app.route('/api/auth', authRouter);
 app.use('/api/admin/*', authMiddleware);
 app.route('/api/admin', adminRouter);
 app.use('/api/webhooks/*', async (c, next) => {
-  // Bypass signature verification for /leads (uses X-CRM-Webhook-Token)
   if (c.req.path.endsWith('/leads')) {
     await next();
     return;
   }
-  // Apply signature verification for HCP and Dialpad webhooks
   const signature = c.req.header('X-Webhook-Signature') || '';
   const timestamp = c.req.header('X-Webhook-Timestamp') || '';
   const payload = await c.req.text();
@@ -61,6 +60,8 @@ app.use('/api/webhooks/*', async (c, next) => {
 app.route('/api/webhooks', webhooksRouter);
 app.use('/api/jobs/*', authMiddleware);
 app.route('/api/jobs', jobsRouter);
+// Add SendGrid route
+app.post('/api/send-email', handleSendgrid);
 // Global error handling
 app.onError(async (err, c) => {
   const errorId = uuidv4();
@@ -149,16 +150,19 @@ export default {
           .bind(attempts, status, errorMessage, evt.id)
           .run();
         if (attempts > 5) {
-          await env.SENDGRID.fetch(new Request('https://api.sendgrid.com/v3/mail/send',{
+          await fetch(env.SENDGRID_API_URL, {
             method: 'POST',
-            headers: new Headers({ 'Content-Type': 'application/json'}), // Use Headers constructor
+            headers: new Headers({
+              'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+              'Content-Type': 'application/json',
+            }),
             body: JSON.stringify({
               to: 'info@elmarair.com',
               from: 'info@elmarair.com',
               subject: `Webhook Failure: ${evt.id}`,
               text: `Failed to process webhook ${evt.id} after ${attempts} attempts: ${errorMessage}`,
-            }) as BodyInit, // Cast string as BodyInit
-          }));
+            }) as BodyInit,
+          });
         }
       }
     }

@@ -7,9 +7,10 @@ export interface Env {
   ADMIN_DB: D1Database; // Admin D1 for webhook_events, audit_logs, dead_letter_queue
   TENANT_CONFIGS: KVNamespace; // Tenant-specific configs
   RATE_LIMIT: DurableObjectNamespace; // Per-tenant rate limiting
-  SENDGRID: Fetcher; // Service binding for email alerts
   ZAPIER_WEBHOOK_SECRET: string; // Token for Zapier leads webhook
   HCP_WEBHOOK_SECRET: string; // HCP webhook signature secret
+  SENDGRID_API_URL: string; // SendGrid API URL
+  SENDGRID_API_KEY: string; // SendGrid API key secret
   DIALPAD_WEBHOOK_SECRET: string; // Dialpad webhook secret
   DIALPAD_SECRET_PROP: string; // Dialpad prop secret
   ACCOUNT_ID?: string; // For admin/jobs routes

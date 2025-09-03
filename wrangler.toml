@@ -8,7 +8,9 @@ name = "RATE_LIMIT"
 class_name = "RateLimiter"
 
 [durable_objects]
-[[durable_objects.migrations]]
+bindings = [{ name = "RATE_LIMIT", class_name = "RateLimiter" }]
+
+[[migrations]]
 tag = "v1"
 new_classes = ["RateLimiter"]
 
@@ -28,10 +30,7 @@ id = "fa1a750bbefb4247b289a33fe4774b02"
 
 [vars]
 ACCOUNT_ID = "e389917ff47be3b722b6c3541b732926"
-
-[[services]]
-binding = "SENDGRID"
-service = "sendgrid-worker"
+SENDGRID_API_URL = "https://api.sendgrid.com/v3/mail/send"
 
 [triggers]
 crons = ["*/5 * * * *"]
