@@ -3,10 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2025-08-26"
 compatibility_flags = ["nodejs_compat"]
 
-[[durable_objects.bindings]]
-name = "RATE_LIMIT"
-class_name = "RateLimiter"
-
 [durable_objects]
 bindings = [{ name = "RATE_LIMIT", class_name = "RateLimiter" }]
 
